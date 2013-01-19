@@ -1,8 +1,6 @@
 
-int connect_stream(const char *host, const char *serv);
-int connect_dgram(const char *host, const char *serv);
+struct hey_lookup;
 
-int connect_stream_srv(const char *host, const char *serv);
-int connect_dgram_srv(const char *host, const char *serv);
+int hey_do_connect(struct hey_lookup *lookup, int absto, int deltato);
 
 
