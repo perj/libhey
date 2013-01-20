@@ -1,5 +1,6 @@
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <errno.h>
@@ -10,6 +11,7 @@
 #include "connect.h"
 #include "lookup.h"
 #include "poller.h"
+#include "timefuncs.h"
 
 int
 hey_connect_addr(const struct hey_addr *addr, bool *ready)
@@ -82,9 +84,7 @@ hey_connect_poll(struct hey_poller *poller, int *fds, int *nfds, int *err)
 	while (!ready || *nfds == 10)
 	{
 		idx = hey_poller_poll(poller, fds, *nfds, &ready);
-		if (idx == POLLER_ABS_TIMEOUT)
-			break;
-		if (idx == POLLER_DELTA_TIMEOUT)
+		if (idx < 0)
 			ready = true;
 		else if (!ready)
 		{
@@ -94,7 +94,7 @@ hey_connect_poll(struct hey_poller *poller, int *fds, int *nfds, int *err)
 			close(fds[idx]);
 			if (--*nfds == 0)
 			{
-				idx = POLLER_DELTA_TIMEOUT;
+				idx = POLLER_TIMEOUT;
 				break;
 			}
 			memmove(fds + idx, fds + idx + 1, (*nfds - idx) * sizeof (*fds));
@@ -111,23 +111,49 @@ hey_do_connect(struct hey_lookup *lookup, int absto, int deltato)
 	struct hey_poller poller;
 	int fds[10];
 	int nfds = 0;
-	int idx = POLLER_DELTA_TIMEOUT;
+	int idx = POLLER_TIMEOUT;
 	int err = 0;
+	struct timespec tsabs, tsdelta;
 
 	hey_next_init(&next, lookup);
-	hey_poller_init(&poller, absto, deltato);
 
-	while (idx == POLLER_DELTA_TIMEOUT && (addr = hey_next_addr(&next)))
+	if (ts_now(&tsabs))
+		return -1;
+	tsdelta = tsabs;
+	ts_add_ms(&tsabs, absto);
+
+	if (hey_poller_init(&poller))
+		return -1;
+
+	while (idx == POLLER_TIMEOUT && (addr = hey_next_addr(&next)))
 	{
 		bool ready;
 		int s = hey_connect_addr(addr, &ready);
 
 		if (s < 0)
+		{
+			err = errno;
 			continue;
+		}
 
-		idx = nfds;
 		fds[nfds++] = s;
 
+		if (ready)
+		{
+			idx = nfds - 1;
+			break;
+		}
+
+		ts_add_ms(&tsdelta, deltato);
+		if (ts_cmp(&tsdelta, &tsabs) > 0)
+			tsdelta = tsabs;
+		hey_poller_reset_timeout(&poller, &tsdelta);
+		idx = hey_connect_poll(&poller, fds, &nfds, &err);
+	}
+
+	if (idx == POLLER_TIMEOUT && nfds > 0)
+	{
+		hey_poller_reset_timeout(&poller, &tsabs);
 		idx = hey_connect_poll(&poller, fds, &nfds, &err);
 	}
 
@@ -138,10 +164,14 @@ hey_do_connect(struct hey_lookup *lookup, int absto, int deltato)
 		if (nfds != idx)
 			close(fds[nfds]);
 	}
-	if (idx < 0)
+	if (idx == POLLER_FATAL)
+		return -1;
+	if (idx == POLLER_TIMEOUT)
 	{
 		if (err)
 			errno = err;
+		else
+			errno = ETIMEDOUT;
 		return -1;
 	}
 	return fds[idx];
