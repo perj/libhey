@@ -23,6 +23,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/types.h>
+
 struct hey;
 
 enum hey_af_flag
@@ -44,6 +46,23 @@ enum hey_af
 	hey_af_inet6_mapped_or_unix = hey_aff_inet6 | hey_aff_inet6_mapped | hey_aff_unix,
 };
 
+#define HEY_ETIMEDOUT    -1
+#define HEY_EINVAL       -2
+#define HEY_ESYSTEM      -3
+#define HEY_EAI_AGAIN    -10
+#define HEY_EAI_BADFLAGS -11
+#define HEY_EAI_BADHINTS -12
+#define HEY_EAI_FAIL     -13
+#define HEY_EAI_FAMILY   -14
+#define HEY_EAI_MEMORY   -15
+#define HEY_EAI_NONAME   -16
+#define HEY_EAI_OVERFLOW -17
+#define HEY_EAI_PROTOCOL -18
+#define HEY_EAI_SERVICE  -19
+#define HEY_EAI_SOCKTYPE -20
+#define HEY_EAI_SYSTEM   -21
+#define HEY_EAI_UNKNOWN  -22
+
 struct hey *hey_create(enum hey_af af, int use_srv);
 void hey_free(struct hey *hey);
 
@@ -51,3 +70,6 @@ void hey_set_cache_ttl(struct hey *hey, int seconds);
 void hey_clear_cache(struct hey *hey, const char *host);
 
 int hey_connect(struct hey *hey, const char *host, const char *serv, int timeout);
+
+const char *hey_strerror(int err, char *buf, size_t buflen);
+

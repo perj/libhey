@@ -40,6 +40,38 @@ static const int af_lookup[] =
 	[ hey_aff_inet | hey_aff_inet6 ] = AF_UNSPEC,
 };
 
+static int
+hey_gai_error(int err)
+{
+	switch (err) {
+	case EAI_AGAIN:
+		return HEY_EAI_AGAIN;
+	case EAI_BADFLAGS:
+		return HEY_EAI_BADFLAGS;
+	case EAI_BADHINTS:
+		return HEY_EAI_BADHINTS;
+	case EAI_FAIL:
+		return HEY_EAI_FAIL;
+	case EAI_FAMILY:
+		return HEY_EAI_FAMILY;
+	case EAI_MEMORY:
+		return HEY_EAI_MEMORY;
+	case EAI_NONAME:
+		return HEY_EAI_NONAME;
+	case EAI_OVERFLOW:
+		return HEY_EAI_OVERFLOW;
+	case EAI_PROTOCOL:
+		return HEY_EAI_PROTOCOL;
+	case EAI_SERVICE:
+		return HEY_EAI_SERVICE;
+	case EAI_SOCKTYPE:
+		return HEY_EAI_SOCKTYPE;
+	case EAI_SYSTEM:
+		return HEY_EAI_SYSTEM;
+	}
+	return HEY_EAI_UNKNOWN;
+}
+
 static struct hey_addr **
 hey_add_lookup(struct hey_addr **tail, struct addrinfo *addr)
 {
@@ -59,7 +91,7 @@ hey_add_lookup(struct hey_addr **tail, struct addrinfo *addr)
 }
 
 void
-hey_remove_lookup(struct hey_addr *addr)
+hey_lookup_remove(struct hey_addr *addr)
 {
 	*addr->rptr = addr->next;
 	if (addr->next)
@@ -95,7 +127,7 @@ hey_lookup(struct hey_lookup *dst, enum hey_af af, const char *host, const char 
 
 	err = getaddrinfo(host, serv, &hints, &res);
 	if (err)
-		return err;
+		return hey_gai_error(err);
 
 	dst->pref_af = hey_real_af(res);
 
@@ -106,10 +138,18 @@ hey_lookup(struct hey_lookup *dst, enum hey_af af, const char *host, const char 
 		else
 			tail4 = hey_add_lookup(tail4, curr);
 		if (!tail4 || !tail6)
-			return EAI_MEMORY;
+			return HEY_ESYSTEM;
 	}
 	*tail4 = NULL;
 	*tail6 = NULL;
 	return 0;
 }
 
+void
+hey_lookup_cleanup(struct hey_lookup *lookup)
+{
+	while (lookup->inet4)
+		hey_lookup_remove(lookup->inet4);
+	while (lookup->inet6)
+		hey_lookup_remove(lookup->inet6);
+}

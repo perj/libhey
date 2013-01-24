@@ -23,24 +23,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/socket.h>
+#include <stdlib.h>
 
-struct hey_addr
+#include <err.h>
+
+#include "hey.h"
+
+void
+test_hey(const char *host, const char *serv)
 {
-	struct hey_addr **rptr;
-	struct hey_addr *next;
-	int family;
-	socklen_t addrlen;
-	struct sockaddr_storage addr;
-};
+	int r = hey_connect(NULL, host, serv, 10000);
+	char buf[256];
 
-struct hey_lookup
+	if (r < 0)
+		errx(1, "hey_connect failed: %s", hey_strerror(r, buf, sizeof (buf)));
+}
+
+
+int
+main(int argc, char *argv[])
 {
-	struct hey_addr *inet4;
-	struct hey_addr *inet6;
-	int pref_af;
-};
-
-int hey_lookup(struct hey_lookup *dst, enum hey_af af, const char *host, const char *serv);
-
-void hey_lookup_cleanup(struct hey_lookup *lookup);
+	test_hey(argv[1], argv[2] ?: "http");
+}

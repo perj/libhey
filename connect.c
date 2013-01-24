@@ -142,12 +142,12 @@ hey_do_connect(struct hey_lookup *lookup, int absto, int deltato)
 	hey_next_init(&next, lookup);
 
 	if (ts_now(&tsabs))
-		return -1;
+		return HEY_ESYSTEM;
 	tsdelta = tsabs;
 	ts_add_ms(&tsabs, absto);
 
 	if (hey_poller_init(&poller))
-		return -1;
+		return HEY_ESYSTEM;
 
 	while (idx == POLLER_TIMEOUT && (addr = hey_next_addr(&next)))
 	{
@@ -189,14 +189,16 @@ hey_do_connect(struct hey_lookup *lookup, int absto, int deltato)
 			close(fds[nfds]);
 	}
 	if (idx == POLLER_FATAL)
-		return -1;
+		return HEY_ESYSTEM;
 	if (idx == POLLER_TIMEOUT)
 	{
 		if (err)
+		{
 			errno = err;
-		else
-			errno = ETIMEDOUT;
-		return -1;
+			return HEY_ESYSTEM;
+		}
+		errno = ETIMEDOUT;
+		return HEY_ETIMEDOUT;
 	}
 	return fds[idx];
 }

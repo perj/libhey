@@ -26,8 +26,10 @@
 CFLAGS = -g -Wall
 LDFLAGS = -g
 
-all: test_lookup test_connect
+all: test_lookup test_connect test_hey
 
 test_lookup: test_lookup.o lookup.o
 
 test_connect: test_connect.o lookup.o connect.o poller.o timefuncs.o
+
+test_hey: test_hey.o hey.o lookup.o connect.o poller.o timefuncs.o
