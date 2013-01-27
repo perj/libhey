@@ -56,16 +56,28 @@ static const int hey_gai_err_lookup[] =
 {
 	[ -HEY_EAI_AGAIN ] = EAI_AGAIN,
 	[ -HEY_EAI_BADFLAGS ] = EAI_BADFLAGS,
+#ifdef EAI_BADHINTS
 	[ -HEY_EAI_BADHINTS ] = EAI_BADHINTS,
+#endif
 	[ -HEY_EAI_FAIL ] = EAI_FAIL,
 	[ -HEY_EAI_FAMILY ] = EAI_FAMILY,
 	[ -HEY_EAI_MEMORY ] = EAI_MEMORY,
 	[ -HEY_EAI_NONAME ] = EAI_NONAME,
+#ifdef EAI_OVERFLOW
 	[ -HEY_EAI_OVERFLOW ] = EAI_OVERFLOW,
+#endif
+#ifdef EAI_PROTOCOL
 	[ -HEY_EAI_PROTOCOL ] = EAI_PROTOCOL,
+#endif
 	[ -HEY_EAI_SERVICE ] = EAI_SERVICE,
 	[ -HEY_EAI_SOCKTYPE ] = EAI_SOCKTYPE,
 	[ -HEY_EAI_SYSTEM ] = EAI_SYSTEM,
+#ifdef EAI_NODATA
+	[ -HEY_EAI_NODATA ] = EAI_NODATA,
+#endif
+#ifdef EAI_ADDRFAMILY
+	[ -HEY_EAI_ADDRFAMILY ] = EAI_ADDRFAMILY,
+#endif
 };
 
 const char *hey_strerror(int err, char *buf, size_t buflen)
@@ -91,6 +103,8 @@ const char *hey_strerror(int err, char *buf, size_t buflen)
 	case HEY_EAI_SERVICE:
 	case HEY_EAI_SOCKTYPE:
 	case HEY_EAI_SYSTEM:
+	case HEY_EAI_NODATA:
+	case HEY_EAI_ADDRFAMILY:
 		return gai_strerror(hey_gai_err_lookup[-err]);
 	case HEY_EAI_UNKNOWN:
 		snprintf(buf, buflen, "getaddrinfo unknown error");

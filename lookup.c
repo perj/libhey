@@ -48,8 +48,10 @@ hey_gai_error(int err)
 		return HEY_EAI_AGAIN;
 	case EAI_BADFLAGS:
 		return HEY_EAI_BADFLAGS;
+#ifdef EAI_BADHINTS
 	case EAI_BADHINTS:
 		return HEY_EAI_BADHINTS;
+#endif
 	case EAI_FAIL:
 		return HEY_EAI_FAIL;
 	case EAI_FAMILY:
@@ -58,16 +60,28 @@ hey_gai_error(int err)
 		return HEY_EAI_MEMORY;
 	case EAI_NONAME:
 		return HEY_EAI_NONAME;
+#ifdef EAI_OVERFLOW
 	case EAI_OVERFLOW:
 		return HEY_EAI_OVERFLOW;
+#endif
+#ifdef EAI_PROTOCOL
 	case EAI_PROTOCOL:
 		return HEY_EAI_PROTOCOL;
+#endif
 	case EAI_SERVICE:
 		return HEY_EAI_SERVICE;
 	case EAI_SOCKTYPE:
 		return HEY_EAI_SOCKTYPE;
 	case EAI_SYSTEM:
 		return HEY_EAI_SYSTEM;
+#ifdef EAI_NODATA
+	case EAI_NODATA:
+		return HEY_EAI_NODATA;
+#endif
+#ifdef EAI_ADDRFAMILY
+	case EAI_ADDRFAMILY
+		return HEY_EAI_ADDRFAMILY;
+#endif
 	}
 	return HEY_EAI_UNKNOWN;
 }
