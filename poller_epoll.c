@@ -23,22 +23,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "poller.h"
-#include "timefuncs.h"
-
 #include <errno.h>
-#include <unistd.h>
+#include <sys/epoll.h>
 
-#include <sys/event.h>
-#include <sys/time.h>
+#include "poller.h"
 
 int
 hey_poller_init(struct hey_poller *poller)
 {
-	poller->kqfd = kqueue();
-	if (poller->kqfd < 0)
+	poller->epfd = epoll_create(10);
+	poller->activefds = 0;
+	if (poller->epfd < 0)
 		return -1;
 	return 0;
+}
+
+int
+hey_poller_cleanup(struct hey_poller *poller)
+{
+	close(poller->epfd);
 }
 
 void
@@ -50,13 +53,17 @@ hey_poller_reset_timeout(struct hey_poller *poller, const struct timespec *absto
 int
 hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready)
 {
-	struct kevent changes[10], event;
-	int nchanges = 0;
+	struct epoll_event event;
 	struct timespec to;
 	int r;
 
 	while (poller->activefds < nfds)
-		EV_SET(&changes[nchanges++], fds[poller->activefds++], EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+	{
+		int fd = fds[poller->activefds++];
+		struct epoll_event addev = { .events = EPOLLOUT, .data = { .fd = fd } };
+		if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, fd, &addev))
+			return POLLER_FATAL;
+	}
 
 	do {
 		if (ts_now(&to))
@@ -65,8 +72,7 @@ hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready)
 			to.tv_sec = to.tv_nsec = 0;
 		else
 			ts_sub_ts(&to, &poller->absto, &to);
-
-		r = kevent(poller->kqfd, changes, nchanges, &event, 1, &to);
+		r = epoll_wait(poller->epfd, &event, 1, to.tv_sec * 1000 + to.tv_nsec / 1000000);
 	} while (r == -1 && errno == EINTR);
 
 	if (r < 0)
@@ -76,19 +82,12 @@ hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready)
 
 	while (--nfds >= 0)
 	{
-		if (event.ident == fds[nfds])
+		if (event.data.fd == fds[nfds])
 			break;
 	}
 
-	*ready = event.flags & EV_EOF ? false : true;
+	*ready = event.events & EPOLLHUP ? false : true;
 	poller->activefds--;
 	return nfds;
-}
-
-int
-hey_poller_cleanup(struct hey_poller *poller)
-{
-	close(poller->kqfd);
-	return 0;
 }
 

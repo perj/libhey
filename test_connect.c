@@ -52,4 +52,5 @@ int
 main(int argc, char *argv[])
 {
 	test_connect(hey_af_any_inet, argv[1], argv[2] ?: "http");
+	return 0;
 }

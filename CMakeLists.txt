@@ -23,7 +23,21 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-add_library(hey SHARED hey.c lookup.c connect.c poller.c timefuncs.c)
+INCLUDE(CheckFunctionExists)
+
+CHECK_FUNCTION_EXISTS(kqueue HAVE_KQUEUE)
+CHECK_FUNCTION_EXISTS(epoll_ctl HAVE_EPOLL)
+
+IF(HAVE_KQUEUE)
+	SET(poller poller_kqueue.c)
+ELSEIF(HAVE_EPOLL)
+	SET(poller poller_epoll.c)
+ENDIF(HAVE_KQUEUE)
+
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+CONFIGURE_FILE(config.h.in config.h)
+
+add_library(hey SHARED hey.c lookup.c connect.c timefuncs.c ${poller})
 set_target_properties(hey PROPERTIES VERSION 1.0 SOVERSION 1.0)
 
 add_executable(test_lookup test_lookup.c)
