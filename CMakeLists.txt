@@ -21,7 +21,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 add_library(hey SHARED hey.c lookup.c connect.c poller.c timefuncs.c)
 set_target_properties(hey PROPERTIES VERSION 1.0 SOVERSION 1.0)
