@@ -1,4 +1,3 @@
-#
 # Copyright (c) 2013 Per Johansson
 # All rights reserved.
 #
@@ -21,15 +20,20 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
 
-CFLAGS = -g -Wall
-LDFLAGS = -g
+cmake_minimum_required(VERSION 2.8)
 
-all: test_lookup test_connect test_hey
+add_library(hey SHARED hey.c lookup.c connect.c poller.c timefuncs.c)
+set_target_properties(hey PROPERTIES VERSION 1.0 SOVERSION 1.0)
 
-test_lookup: test_lookup.o lookup.o
+add_executable(test_lookup test_lookup.c)
+target_link_libraries(test_lookup hey)
 
-test_connect: test_connect.o lookup.o connect.o poller.o timefuncs.o
+add_executable(test_connect test_connect.c)
+target_link_libraries(test_connect hey)
 
-test_hey: test_hey.o hey.o lookup.o connect.o poller.o timefuncs.o
+add_executable(test_hey test_hey.c)
+target_link_libraries(test_hey hey)
+
+install(TARGETS hey LIBRARY DESTINATION lib)
+install(FILES hey.h DESTINATION include)
