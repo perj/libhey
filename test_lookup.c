@@ -59,8 +59,8 @@ void
 print_addr_chain(struct hey_addr *addr)
 {
 	char afbuf[256];
-	char host[NI_MAXHOST];
-	char serv[NI_MAXSERV];
+	char host[512];
+	char serv[64];
 
 	for ( ; addr ; addr = addr->next) {
 		if (getnameinfo((struct sockaddr*)&addr->addr, addr->addrlen, host, sizeof (host), serv, sizeof (serv), NI_NUMERICHOST | NI_NUMERICSERV))

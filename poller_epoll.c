@@ -24,9 +24,12 @@
  */
 
 #include <errno.h>
+#include <unistd.h>
+
 #include <sys/epoll.h>
 
 #include "poller.h"
+#include "timefuncs.h"
 
 int
 hey_poller_init(struct hey_poller *poller)
@@ -42,6 +45,7 @@ int
 hey_poller_cleanup(struct hey_poller *poller)
 {
 	close(poller->epfd);
+	return 0;
 }
 
 void

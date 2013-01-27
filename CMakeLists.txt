@@ -23,6 +23,9 @@
 
 cmake_minimum_required(VERSION 2.6)
 
+SET(CMAKE_C_FLAGS "-g -Os -std=c99 -D_POSIX_C_SOURCE=200809L")
+SET(CMAKE_C_FLAGS_DEBUG "-g -O1 -Wall -Wwrite-strings -Wformat-security -Wempty-body -Werror -std=c99 -D_POSIX_C_SOURCE=200809L")
+
 INCLUDE(CheckFunctionExists)
 
 CHECK_FUNCTION_EXISTS(kqueue HAVE_KQUEUE)
