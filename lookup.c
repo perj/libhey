@@ -79,7 +79,7 @@ hey_gai_error(int err)
 		return HEY_EAI_NODATA;
 #endif
 #ifdef EAI_ADDRFAMILY
-	case EAI_ADDRFAMILY
+	case EAI_ADDRFAMILY:
 		return HEY_EAI_ADDRFAMILY;
 #endif
 	}
