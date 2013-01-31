@@ -27,10 +27,11 @@
 #include "timefuncs.h"
 
 #include <errno.h>
+
+#include <sys/time.h>
 #include <unistd.h>
 
 #include <sys/event.h>
-#include <sys/time.h>
 
 int
 hey_poller_init(struct hey_poller *poller)

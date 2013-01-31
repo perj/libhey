@@ -26,8 +26,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <err.h>
 #include <netdb.h>
+
+#include <err.h>
 
 #include "hey.h"
 #include "lookup.h"

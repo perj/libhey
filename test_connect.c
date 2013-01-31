@@ -25,9 +25,10 @@
 
 #include <string.h>
 
-#include <err.h>
 #include <errno.h>
 #include <netdb.h>
+
+#include <err.h>
 
 #include "hey.h"
 #include "lookup.h"
