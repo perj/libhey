@@ -35,6 +35,8 @@ IF(HAVE_KQUEUE)
 	SET(poller poller_kqueue.c)
 ELSEIF(HAVE_EPOLL)
 	SET(poller poller_epoll.c)
+ELSE(HAVE_KQUEUE)
+	SET(poller poller_poll.c)
 ENDIF(HAVE_KQUEUE)
 
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)

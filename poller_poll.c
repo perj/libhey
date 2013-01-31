@@ -23,28 +23,67 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdbool.h>
-#include <time.h>
+#include <errno.h>
 
-#include "config.h"
+#include <poll.h>
 
-#define POLLER_TIMEOUT -1
-#define POLLER_FATAL -2
+#include "poller.h"
+#include "timefuncs.h"
 
-#define POLLER_MAX_FDS 10
+int
+hey_poller_init(struct hey_poller *poller)
+{
+	return 0;
+}
 
-struct hey_poller;
+int
+hey_poller_cleanup(struct hey_poller *poller)
+{
+	return 0;
+}
 
-#ifdef HAVE_KQUEUE
-#include "poller_kqueue.h"
-#elif defined(HAVE_EPOLL)
-#include "poller_epoll.h"
-#else
-#include "poller_poll.h"
-#endif
+void
+hey_poller_reset_timeout(struct hey_poller *poller, const struct timespec *absto)
+{
+	poller->absto = *absto;
+}
 
-int hey_poller_init(struct hey_poller *poller);
-int hey_poller_cleanup(struct hey_poller *poller);
+int
+hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready)
+{
+	struct pollfd events[POLLER_MAX_FDS];
+	int i;
+	int r;
+	struct timespec to;
 
-void hey_poller_reset_timeout(struct hey_poller *poller, const struct timespec *absto);
-int hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready);
+	for (i = 0 ; i < nfds ; i++)
+	{
+		events[i].fd = fds[i];
+		events[i].events = POLLOUT;
+		events[i].revents = 0;
+	}
+
+	do {
+		if (ts_now(&to))
+			return -1;
+		if (ts_cmp(&to, &poller->absto) > 0)
+			to.tv_sec = to.tv_nsec = 0;
+		else
+			ts_sub_ts(&to, &poller->absto, &to);
+		r = poll(events, nfds, to.tv_sec * 1000 + to.tv_nsec / 1000000);
+	} while (r == -1 && errno == EINTR);
+
+	if (r < 0)
+		return POLLER_FATAL;
+	if (r == 0)
+		return POLLER_TIMEOUT;
+
+	for (i = 0 ; i < nfds ; i++)
+	{
+		if (events[i].revents)
+			break;
+	}
+	*ready = events[i].revents & POLLHUP ? false : true;
+	return i;
+}
+

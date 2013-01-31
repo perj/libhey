@@ -23,28 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdbool.h>
-#include <time.h>
-
-#include "config.h"
-
-#define POLLER_TIMEOUT -1
-#define POLLER_FATAL -2
-
-#define POLLER_MAX_FDS 10
-
-struct hey_poller;
-
-#ifdef HAVE_KQUEUE
-#include "poller_kqueue.h"
-#elif defined(HAVE_EPOLL)
-#include "poller_epoll.h"
-#else
-#include "poller_poll.h"
-#endif
-
-int hey_poller_init(struct hey_poller *poller);
-int hey_poller_cleanup(struct hey_poller *poller);
-
-void hey_poller_reset_timeout(struct hey_poller *poller, const struct timespec *absto);
-int hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready);
+struct hey_poller
+{
+	struct timespec absto;
+};
