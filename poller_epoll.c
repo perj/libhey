@@ -35,7 +35,7 @@
 int
 hey_poller_init(struct hey_poller *poller)
 {
-	poller->epfd = epoll_create(10);
+	poller->epfd = epoll_create(POLLER_MAX_FDS);
 	poller->activefds = 0;
 	if (poller->epfd < 0)
 		return -1;

@@ -105,7 +105,7 @@ hey_connect_poll(struct hey_poller *poller, int *fds, int *nfds, int *err)
 	bool ready = false;
 
 	/* Don't leave loop if no space left in fds */
-	while (!ready || *nfds == 10)
+	while (!ready || *nfds == POLLER_MAX_FDS)
 	{
 		idx = hey_poller_poll(poller, fds, *nfds, &ready);
 		if (idx < 0)
@@ -133,7 +133,7 @@ hey_do_connect(struct hey_lookup *lookup, int absto, int deltato)
 	struct hey_next next;
 	const struct hey_addr *addr;
 	struct hey_poller poller;
-	int fds[10];
+	int fds[POLLER_MAX_FDS];
 	int nfds = 0;
 	int idx = POLLER_TIMEOUT;
 	int err = 0;

@@ -31,6 +31,8 @@
 #define POLLER_TIMEOUT -1
 #define POLLER_FATAL -2
 
+#define POLLER_MAX_FDS 10
+
 struct hey_poller;
 
 #ifdef HAVE_KQUEUE

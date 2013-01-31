@@ -52,7 +52,7 @@ hey_poller_reset_timeout(struct hey_poller *poller, const struct timespec *absto
 int
 hey_poller_poll(struct hey_poller *poller, int *fds, int nfds, bool *ready)
 {
-	struct kevent changes[10], event;
+	struct kevent changes[POLLER_MAX_FDS], event;
 	int nchanges = 0;
 	struct timespec to;
 	int r;
