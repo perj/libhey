@@ -43,4 +43,32 @@ it doessn't necessarily fill `buf`, the return value should be used.
     if (s < 0)
         errx(1, "hey_connect: %s", hey_strerror(s, errbuf, sizeof (errbuf)));
 
+## Compiling
+
+libhey is build using [cmake][]. To install in the default prefix /usr/local:
+
+    cmake .
+    make
+    sudo make install
+
+You can change the prefix by adding `-DCMAKE_INSTALL_PREFIX`:
+
+    cmake -DCMAKE_INSTALL_PREFIX=/usr .
+
+You can also replace cmake with ccmake to interactively edit flags.
+
+For development/hacking, it's recommended that you use a separate build
+directory, and add the flag `-DCMAKE_BUILD_TYPE=Debug`:
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    make
+
   [Happy Eyeballs]: http://tools.ietf.org/html/rfc6555
+  [cmake]: http://www.cmake.org
+
+## License
+ 
+libhey is distributed under the BSD 2-clause license, see the various source
+files for details.
