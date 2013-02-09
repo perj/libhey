@@ -22,10 +22,16 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 2.6)
+project(libhey C)
+SET(CPACK_PACKAGE_VENDOR "Per Johansson")
+SET(CPACK_PACKAGE_VERSION "1.0")
+SET(API_VERSION "1.0")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Happy Eyeballs library")
 
 SET(CMAKE_C_FLAGS "-g -Os -std=c99 -D_POSIX_C_SOURCE=200809L")
-SET(CMAKE_C_FLAGS_DEBUG "-g -O1 -Wall -Wwrite-strings -Wformat-security -Wempty-body -Werror -std=c99 -D_POSIX_C_SOURCE=200809L")
+SET(CMAKE_C_FLAGS_DEBUG "-g -Os -Wall -Wwrite-strings -Wformat-security -Wempty-body -Werror -std=c99 -D_POSIX_C_SOURCE=200809L")
 
+INCLUDE(CPack)
 INCLUDE(CheckFunctionExists)
 
 CHECK_FUNCTION_EXISTS(kqueue HAVE_KQUEUE)
@@ -43,7 +49,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 CONFIGURE_FILE(config.h.in config.h)
 
 add_library(hey SHARED hey.c lookup.c connect.c timefuncs.c ${poller})
-set_target_properties(hey PROPERTIES VERSION 1.0 SOVERSION 1.0)
+set_target_properties(hey PROPERTIES VERSION ${CPACK_PACKAGE_VERSION} SOVERSION ${API_VERSION})
 
 add_executable(test_lookup test_lookup.c)
 target_link_libraries(test_lookup hey)
@@ -56,3 +62,4 @@ target_link_libraries(test_hey hey)
 
 install(TARGETS hey LIBRARY DESTINATION lib)
 install(FILES hey.h DESTINATION include)
+install(FILES doc/hey_connect.3 doc/hey_strerror.3 DESTINATION share/man/man3)
