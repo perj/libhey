@@ -17,7 +17,7 @@ But it does it using [Happy Eyeballs][] and it's dead easy to use.
 
 ## Compiling
 
-libhey is build using [cmake][]. To install in the default prefix /usr/local:
+libhey is built using [cmake][]. To install in the default prefix /usr/local:
 
     cmake .
     make
