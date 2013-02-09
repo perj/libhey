@@ -1,5 +1,5 @@
 
-files=*.ronn
+files=*.ronn.md
 
-${files:ronn=3} ${files:ronn=3.html}: ${files}
+${files:ronn.md=} ${files:ronn.md=html}: ${files}
 	ronn --manual="libhey manual" --organization="Per Johansson" ${files}

@@ -38,8 +38,8 @@ directory, and add the flag `-DCMAKE_BUILD_TYPE=Debug`:
     make
 
   [libhey]: http://www.libhey.org
-  [hey_connect]: doc/hey_connect.3.html
-  [hey_strerror]: doc/hey_strerror.3.html
+  [hey_connect]: doc/hey_connect.3.ronn.md
+  [hey_strerror]: doc/hey_strerror.3.ronn.md
   [Happy Eyeballs]: http://tools.ietf.org/html/rfc6555
   [cmake]: http://www.cmake.org
 
