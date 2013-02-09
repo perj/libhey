@@ -1,39 +1,11 @@
 
-libhey does one thing, it connects sockets, and only stream sockets at that.
+[libhey][] does one thing, it connects sockets, and only stream sockets at that.
 But it does it using [Happy Eyeballs][] and it's dead easy to use.
 
-## Synopsis
+## Functions
 
-    #include <hey.h>
-
-    int
-    hey_connect(struct hey *hey, const char *host, const char *port, int timeoutms);
-
-    const char *
-    hey_strerror(int err, char *buf, size_t buflen)
-
-## Description
-
-So far, only basic Happy Eyeballs is supported. The `hey` argument should be `NULL`.
-
-In basic mode, `hey_connect` will call `getaddrinfo` followed by `connect`.
-Before calling `connect` it rearranges the addresses to alternate between IPv4 and IPv6.
-There's a short timeout on each connect before another one is started in parallel.
-The first socket to finish connecting is returned, while any others are closed.
-
-If more than `timeoutms` milliseconds pass before a connection can be established, the
-call is aborted.
-
-libhey only supports `SOCK_STREAM` sockets, usually TCP.
-
-## Return value
-
-If successful, `hey_connect` will return the connected socket. Note that `O_NONBLOCK`
-is always set. On failure a negative value is returned matching one of the errors
-listed in `<hey.h>`. In the case of `HEY_ESYSTEM`, the system error is given in `errno`.
-
-`hey_strerror` returns a textual representation of the libhey error `err`. Note that
-it doessn't necessarily fill `buf`, the return value should be used.
+* [hey_connect][]
+* [hey_strerror][]
 
 ## Example
 
@@ -65,10 +37,13 @@ directory, and add the flag `-DCMAKE_BUILD_TYPE=Debug`:
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     make
 
+  [libhey]: http://www.libhey.org
+  [hey_connect]: doc/hey_connect.3.html
+  [hey_strerror]: doc/hey_strerror.3.html
   [Happy Eyeballs]: http://tools.ietf.org/html/rfc6555
   [cmake]: http://www.cmake.org
 
 ## License
- 
+
 libhey is distributed under the BSD 2-clause license, see the various source
 files for details.

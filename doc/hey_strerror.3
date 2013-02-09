@@ -1,0 +1,27 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "HEY_STRERROR" "3" "February 2013" "Per Johansson" "libhey manual"
+.
+.SH "NAME"
+\fBhey_strerror\fR \- libhey error messages
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+#include <hey\.h>
+
+const char *
+hey_strerror(int err, char *buf, size_t buflen);
+.
+.fi
+.
+.SH "DESCRIPTION"
+\fBhey_strerror\fR returns a textual representation of the libhey error \fBerr\fR\. Note that it doessn\'t necessarily fill \fBbuf\fR, the return value should be used\.
+.
+.P
+In the case of \fBHEY_ESYSTEM\fR, \fBhey_strerror\fR will call \fBstrerror_r\fR to find the message\.
+.
+.SH "RETURN VALUES"
+A string pointer is returned, containing a description of the error\.

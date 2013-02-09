@@ -1,0 +1,46 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "HEY_CONNECT" "3" "February 2013" "Per Johansson" "libhey manual"
+.
+.SH "NAME"
+\fBhey_connect\fR \- connect to server
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+#include <hey\.h>
+
+int
+hey_connect(struct hey *hey, const char *host, const char *port, int timeoutms);
+.
+.fi
+.
+.SH "DESCRIPTION"
+So far, only basic Happy Eyeballs is supported\. The \fBhey\fR argument should be \fBNULL\fR\.
+.
+.P
+In basic mode, \fBhey_connect\fR will call \fBgetaddrinfo\fR followed by \fBconnect\fR\. Before calling \fBconnect\fR it rearranges the addresses to alternate between IPv4 and IPv6\. There\'s a short timeout on each connect before another one is started in parallel\. The first socket to finish connecting is returned, while any others are closed\.
+.
+.P
+If more than \fBtimeoutms\fR milliseconds pass before a connection can be established, the call is aborted\.
+.
+.P
+libhey currently only supports TCP sockets\.
+.
+.SH "RETURN VALUES"
+If successful, \fBhey_connect\fR will return the connected socket\. Note that \fBO_NONBLOCK\fR is always set\. On failure a negative value is returned matching one of the errors listed in \fB<hey\.h>\fR\. In the case of \fBHEY_ESYSTEM\fR, the system error is given in \fBerrno\fR\.
+.
+.SH "EXAMPLE"
+.
+.nf
+
+int s = hey_connect(NULL, "www\.google\.com", "80", 10000);
+char errbuf[256];
+
+if (s < 0)
+    errx(1, "hey_connect: %s", hey_strerror(s, errbuf, sizeof (errbuf)));
+.
+.fi
+
